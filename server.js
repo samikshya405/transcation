@@ -77,6 +77,33 @@ app.get("/transaction/:id", (req, res) => {
     transaction,
   });
 });
+//adding transaction
+
+app.post("/transaction", (req, res) => {
+  const transaction = req.body;
+
+  if (
+    !transaction.type ||
+    (transaction.type !== "income" && transaction.type !== "expense") ||
+    !transaction.amount ||
+    typeof transaction.amount !== "number" ||
+    transaction.amount <= 0 ||
+    !transaction.category
+  ) {
+    return res.status(400).json({
+      status: "not success",
+      message: "Transaction invalid",
+    });
+  }
+  const date = new Date().toISOString().split("T")[0];
+  const transactionToAdd = { ...transaction, id: Date.now(), date };
+  transactions.push(transactionToAdd);
+  res.json({
+    status: "success",
+    message: "transaction has been added",
+    transaction: transactionToAdd,
+  });
+});
 
 app.listen(port, () => {
   console.log(`server running on port ${port}`);
