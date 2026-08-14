@@ -104,7 +104,42 @@ app.post("/transaction", (req, res) => {
     transaction: transactionToAdd,
   });
 });
+app.patch("/transaction/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const newTransaction = req.body;
 
+  const transcationIndex = transactions.findIndex((item) => item.id === id);
+  if (transcationIndex === -1) {
+    return res.status(404).json({
+      status: "not success",
+      message: "Transaction not found",
+    });
+  }
+  const updatedTransaction = {
+    ...transactions[transcationIndex],
+    ...newTransaction,
+  };
+
+  if (
+    !updatedTransaction.type ||
+    (updatedTransaction.type !== "income" &&
+      updatedTransaction.type !== "expense") ||
+    !updatedTransaction.amount ||
+    typeof updatedTransaction.amount !== "number" ||
+    updatedTransaction.amount <= 0 ||
+    !updatedTransaction.category
+  ) {
+    return res.status(400).json({
+      status: "not success",
+      message: "Transaction invalid",
+    });
+  }
+  transactions[transcationIndex] = updatedTransaction;
+  res.json({
+    status: "success",
+    updatedTransaction,
+  });
+});
 app.listen(port, () => {
   console.log(`server running on port ${port}`);
 });
