@@ -104,6 +104,8 @@ app.post("/transaction", (req, res) => {
     transaction: transactionToAdd,
   });
 });
+
+//update the transaction
 app.patch("/transaction/:id", (req, res) => {
   const id = Number(req.params.id);
   const newTransaction = req.body;
@@ -140,6 +142,22 @@ app.patch("/transaction/:id", (req, res) => {
     updatedTransaction,
   });
 });
+//delete transaction
+app.delete('/transaction/:id',(req,res)=>{
+    const id = Number(req.params.id);
+    const index = transactions.findIndex((item=>item.id===id));
+    if(index===-1){
+        return res.status(404).json({
+            status:"not success",
+            message:"invalid transaction"
+        })
+    }
+    transactions.splice(index,1)
+    res.json({
+        status:"success",
+        transactions
+    })
+})
 app.listen(port, () => {
   console.log(`server running on port ${port}`);
 });
