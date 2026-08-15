@@ -6,11 +6,12 @@ import {
   getTransactionByID,
   updateTransaction,
 } from "../controllers/transactionController.js";
+import validateTransaction from "../middleware/validateTransaction.js";
 const router = express.Router();
 
 router.get("/transaction", getAllTransactions);
 router.get("/transaction/:id", getTransactionByID);
-router.post("/transaction",addNewTransaction);
+router.post("/transaction",validateTransaction,addNewTransaction);
 router.patch("/transaction/:id",updateTransaction)
 router.delete("/transaction/:id",deleteTransaction)
 
