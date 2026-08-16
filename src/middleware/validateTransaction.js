@@ -7,19 +7,19 @@ const validateTransaction = (req, res, next) => {
       message,
     });
 
-  if (!type || (type !== "income" && type !== "expense")) {
+  if (type !== undefined && type !== "income" && type !== "expense") {
     return error("Invalid transaction type");
   }
 
-  if (typeof amount !== "number" || amount <= 0) {
+  if (amount !== undefined && (typeof amount !== "number" || amount <= 0)) {
     return error("Invalid transaction amount");
   }
 
-  if (!category || !category.trim()) {
+  if (category !== undefined && (!category || !category.trim())) {
     return error("Invalid transaction category");
   }
 
-  if (!description || !description.trim()) {
+  if (description !== undefined && (!description || !description.trim())) {
     return error("Invalid transaction description");
   }
 
