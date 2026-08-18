@@ -8,9 +8,10 @@ import {
 } from "../controllers/transactionController.js";
 import validateTransaction from "../middleware/validateTransaction.js";
 import { loginUsers, registeruser } from "../controllers/authController.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
 
-router.get("/transaction", getAllTransactions);
+router.get("/transaction", authMiddleware, getAllTransactions);
 router.get("/transaction/:id", getTransactionByID);
 router.post("/transaction", validateTransaction, addNewTransaction);
 router.patch("/transaction/:id", updateTransaction);
