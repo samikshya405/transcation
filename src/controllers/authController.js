@@ -17,10 +17,12 @@ const registeruser = async (req, res) => {
 };
 const loginUsers = async (req, res) => {
   const userDetails = req.body;
+
   const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [
     userDetails.email,
   ]);
   if (result.rows.length === 0) {
+    console.log(result.rows);
     return res.status(404).json({
       status: "not success",
       message: "user not found",

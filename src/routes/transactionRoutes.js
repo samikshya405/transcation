@@ -12,10 +12,10 @@ import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.get("/transaction", authMiddleware, getAllTransactions);
-router.get("/transaction/:id", getTransactionByID);
-router.post("/transaction", validateTransaction, addNewTransaction);
-router.patch("/transaction/:id", updateTransaction);
-router.delete("/transaction/:id", deleteTransaction);
+router.get("/transaction/:id",authMiddleware, getTransactionByID);
+router.post("/transaction",authMiddleware, validateTransaction, addNewTransaction);
+router.patch("/transaction/:id",authMiddleware, updateTransaction);
+router.delete("/transaction/:id",authMiddleware, deleteTransaction);
 router.post("/auth/register", registeruser);
 router.post("/auth/login", loginUsers);
 

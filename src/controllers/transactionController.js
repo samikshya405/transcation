@@ -1,7 +1,10 @@
 import pool from "../config/db.js";
 
 const getAllTransactions = async (req, res) => {
-  const result = await pool.query("SELECT * FROM transactions");
+  const result = await pool.query(
+    `SELECT * FROM transactions WHERE user_id = $1`,
+    [req.user.userId],
+  );
   if (result.rows.length === 0) {
     return res.json({
       status: "not success",
@@ -9,23 +12,25 @@ const getAllTransactions = async (req, res) => {
     });
   }
   res.json({
-    status:"success",
+    status: "success",
     transaction: result.rows,
   });
 };
 const addNewTransaction = async (req, res) => {
   const transaction = req.body;
+
   const date = new Date().toISOString().split("T")[0];
 
   const result = await pool.query(
-    `INSERT INTO transactions(type, category, amount, description, date)
- VALUES($1, $2, $3, $4, $5)  RETURNING *`,
+    `INSERT INTO transactions(type, category, amount, description, date, user_id)
+ VALUES($1, $2, $3, $4, $5,$6)  RETURNING *`,
     [
       transaction.type,
       transaction.category,
       transaction.amount,
       transaction.description,
       date,
+      req.user.userId,
     ],
   );
 
@@ -39,9 +44,10 @@ const addNewTransaction = async (req, res) => {
 const updateTransaction = async (req, res) => {
   const id = req.params.id;
   const transaction = req.body;
-  const result = await pool.query(`SELECT * FROM transactions WHERE id=$1`, [
-    id,
-  ]);
+  const result = await pool.query(
+    `SELECT * FROM transactions WHERE id=$1 AND user_id = $2`,
+    [id, req.user.userId],
+  );
   if (result.rows.length === 0) {
     return res.status(404).json({
       status: "not success",
@@ -51,7 +57,7 @@ const updateTransaction = async (req, res) => {
   const exsitingTransaction = result.rows[0];
   const newTransaction = { ...exsitingTransaction, ...transaction };
   const result2 = await pool.query(
-    `UPDATE transactions SET(type,category,amount,description,date) = ($1, $2, $3, $4, $5) WHERE id = $6 RETURNING *`,
+    `UPDATE transactions SET(type,category,amount,description,date) = ($1, $2, $3, $4, $5) WHERE id = $6 AND user_id= $7 RETURNING *`,
     [
       newTransaction.type,
       newTransaction.category,
@@ -59,6 +65,7 @@ const updateTransaction = async (req, res) => {
       newTransaction.description,
       newTransaction.date,
       id,
+      req.user.userId,
     ],
   );
   res.json({
@@ -69,9 +76,10 @@ const updateTransaction = async (req, res) => {
 
 const deleteTransaction = async (req, res) => {
   const id = req.params.id;
-  const result = await pool.query(`DELETE FROM transactions WHERE id = $1`, [
-    id,
-  ]);
+  const result = await pool.query(
+    `DELETE FROM transactions WHERE id = $1 AND user_id = $2`,
+    [id, req.user.userId],
+  );
   if (result.rowCount !== 1) {
     return res.status(404).json({
       status: "not success",
@@ -86,9 +94,10 @@ const deleteTransaction = async (req, res) => {
 
 const getTransactionByID = async (req, res) => {
   const id = req.params.id;
-  const result = await pool.query(`SELECT * FROM transactions WHERE id = $1`, [
-    id,
-  ]);
+  const result = await pool.query(
+    `SELECT * FROM transactions WHERE id = $1 AND user_id=$2`,
+    [id, req.user.userId],
+  );
   if (result.rows.length === 0) {
     return res.status(404).json({
       status: "not success",
