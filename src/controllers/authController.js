@@ -54,4 +54,23 @@ const loginUsers = async (req, res) => {
     token,
   });
 };
-export { registeruser, loginUsers };
+const getCurrentUser = async (req, res,next) => {
+  try {
+    const user_id = req.user.userId;
+    const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [user_id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "id not found",
+      });
+    }
+    const { id, name, email } = result.rows[0];
+    res.status(200).json({
+      status: "true",
+      userDetails: { id, name, email },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export { registeruser, loginUsers, getCurrentUser };
